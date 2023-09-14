@@ -19,9 +19,8 @@ R.:
 #define TAMANHO 10000
 
 void geraNumero(int *vet, int op);
-void merge(int *arr, int p, int q, int r, int *comparacoes);
-void mergeSort(int *arr, int l, int r, int *comparacoes);
 void fazerMergeSort(int *vet);
+void intercala(int x[], int inicio, int fim, int meio, int *qtd_comparacoes, int *qtd_trocas);
 void imprimirVetor(int *vet);
 
 int main()
@@ -30,7 +29,7 @@ int main()
 
     geraNumero(vet1,3);
     fazerMergeSort(vet1);
-    // imprimirVetor(vet1);
+    //imprimirVetor(vet1);
 
     return 0;
 }
@@ -56,64 +55,48 @@ void geraNumero(int *vet, int op)
     }
 }
 
+void merge(int x[], int inicio, int fim, int *qtd_comparacoes, int *qtd_trocas) { 
+    int meio; 
+    if (inicio < fim) { 
+        meio = (inicio + fim) / 2; 
+        merge(x, inicio, meio, qtd_comparacoes, qtd_trocas); 
+        merge(x, meio + 1, fim, qtd_comparacoes, qtd_trocas); 
+        intercala(x, inicio, fim, meio, qtd_comparacoes, qtd_trocas); 
+    } 
+} 
 
-void merge(int arr[], int p, int q, int r, int *comparacoes)
-{
-  int n1 = q - p + 1;
-  int n2 = r - q;
+void intercala(int x[], int inicio, int fim, int meio, int *qtd_comparacoes, int *qtd_trocas) { 
+    int poslivre = inicio, iniciovetor1 = inicio, iniciovetor2 = meio + 1, i; 
+    int aux[TAMANHO]; 
 
-  int L[n1], M[n2];
+    while (iniciovetor1 <= meio && iniciovetor2 <= fim) { 
+        if (x[iniciovetor1] <= x[iniciovetor2]) { 
+            aux[poslivre] = x[iniciovetor1]; 
+            iniciovetor1++; 
+        } else { 
+            aux[poslivre] = x[iniciovetor2]; 
+            iniciovetor2++; 
+        } 
 
-  for (int i = 0; i < n1; i++)
-    L[i] = arr[p + i];
-  for (int j = 0; j < n2; j++)
-    M[j] = arr[q + 1 + j];
+        *qtd_trocas += 1;
+        *qtd_comparacoes += 1;
+        poslivre++; 
+    } 
 
-  int i, j, k;
-  i = 0;
-  j = 0;
-  k = p;
+    for (i = iniciovetor1; i <= meio; i++) { 
+        aux[poslivre] = x[i]; 
+        poslivre++; 
+    } 
 
-  while (i < n1 && j < n2) {
-    if (L[i] <= M[j]) {
-      arr[k] = L[i];
-      i++;
-    } else {
-      arr[k] = M[j];
-      j++;
-    }
-    *comparacoes += 1;
-    k++;
-  }
+    for (i = iniciovetor2; i <= fim; i++) { 
+        aux[poslivre] = x[i]; 
+        poslivre++; 
+    } 
 
-  while (i < n1) {
-    *comparacoes += 1;
-    arr[k] = L[i];
-    i++;
-    k++;
-  }
-
-  while (j < n2) {
-    *comparacoes += 1;
-    arr[k] = M[j];
-    j++;
-    k++;
-  }
-}
-
-void mergeSort(int arr[], int l, int r, int *comparacoes)
-{
-  if (l < r) {
-    *comparacoes += 1;
-
-    int m = l + (r - l) / 2;
-
-    mergeSort(arr, l, m, comparacoes);
-    mergeSort(arr, m + 1, r, comparacoes);
-
-    merge(arr, l, m, r);
-  }
-}
+    for (i = inicio; i <= fim; i++) { 
+        x[i] = aux[i]; 
+    } 
+} 
 
 
 void fazerMergeSort(int *vet)
@@ -124,9 +107,7 @@ void fazerMergeSort(int *vet)
 
     float tempo_inicial = clock();
 
-    int size = sizeof(vet) / sizeof(vet[0]);
-
-    mergeSort(vet, 0, size - 1, &qtd_comparacoes);
+    merge(vet, 0, TAMANHO, &qtd_comparacoes, &qtd_trocas);
 
     float tempo_final = clock() - tempo_inicial;
 

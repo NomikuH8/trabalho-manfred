@@ -28,7 +28,7 @@ int main()
 
     geraNumero(vet1,3);
     bubbleSort(vet1);
-    imprimirVetor(vet1);
+    // imprimirVetor(vet1);
 
     return 0;
 }
