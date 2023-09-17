@@ -19,7 +19,9 @@ R.:
 #define TAMANHO 10000
 
 void geraNumero(int *vet, int op);
-void bubbleSort(int *vet);
+void quickSort(int vet[], int ini, int fim, int *qtd_comparacoes, int *qtd_trocas);
+int partition(int vet[], int ini, int fim, int *qtd_comparacoes, int *qtd_trocas);
+void fazerQuickSort(int *vet);
 void imprimirVetor(int *vet);
 
 int main()
@@ -27,8 +29,8 @@ int main()
     int vet1[TAMANHO];
 
     geraNumero(vet1,3);
-    bubbleSort(vet1);
-    imprimirVetor(vet1);
+    fazerQuickSort(vet1);
+    // imprimirVetor(vet1);
 
     return 0;
 }
@@ -55,33 +57,44 @@ void geraNumero(int *vet, int op)
 }
 
 
-void bubbleSort(int *vet)
+void quickSort(int vet[], int ini, int fim, int *qtd_comparacoes, int *qtd_trocas) { 
+    int meio; 
+
+    if (ini < fim) { 
+        meio = partition(vet, ini, fim, qtd_comparacoes, qtd_trocas); 
+        quickSort(vet, ini, meio, qtd_comparacoes, qtd_trocas); 
+        quickSort(vet, meio + 1, fim, qtd_comparacoes, qtd_trocas); 
+    } 
+} 
+
+int partition(int vet[], int ini, int fim, int *qtd_comparacoes, int *qtd_trocas) { 
+    int pivo, topo, i; 
+    pivo = vet[ini]; 
+    topo = ini; 
+
+    for (i = ini + 1; i <= fim; i++) { 
+        *qtd_comparacoes += 1;
+        if (vet[i] < pivo) { 
+            *qtd_trocas += 1;
+            vet[topo] = vet[i]; 
+            vet[i] = vet[topo + 1]; 
+            topo++; 
+        } 
+    } 
+
+    vet[topo] = pivo; 
+    return topo; 
+} 
+
+void fazerQuickSort(int *vet)
 {
-    int n, troca, i, aux, qtd_trocas, qtd_comparacoes;
-    n = 1;
-    troca = 1;
+    int qtd_trocas, qtd_comparacoes;
     qtd_trocas = 0;
     qtd_comparacoes = 0;
 
     float tempo_inicial = clock();
 
-    while (n <= TAMANHO && troca == 1)
-    {
-        troca = 0;
-        for (i = 0; i <= TAMANHO-2; i++)
-        {
-            qtd_comparacoes++;
-            if (vet[i] > vet[i + 1])
-            {
-                qtd_trocas++;
-                troca = 1;
-                aux = vet[i];
-                vet[i] = vet[i + 1];
-                vet[i + 1] = aux;
-            }
-        }
-        n = n + 1;
-    }
+    quickSort(vet, 0, TAMANHO - 1, &qtd_comparacoes, &qtd_trocas);
 
     float tempo_final = clock() - tempo_inicial;
 
@@ -89,6 +102,7 @@ void bubbleSort(int *vet)
     printf("Quantidade de trocas: %i\n",qtd_trocas);
     printf("Tempo de execucao do algoritmo: %.3f",tempo_final/1000);
 }
+
 
 void imprimirVetor(int *vet)
 {
